@@ -1,0 +1,129 @@
+/* Estilo general del contenedor de horarios */
+h1 {
+  color: black;
+}
+.contenedor-horarios {
+    padding: 20px;
+    background-color: #f0f0f0; /* Fondo claro para resaltar los horarios */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .horario-card {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    color: #2c3e50; /* Color oscuro para los títulos */
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  /* Estilo para las tablas de horarios */
+  .tabla-horario {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .tabla-horario th, .tabla-horario td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+  
+  /* Colores de fondo para las celdas */
+  .tabla-horario th {
+    background-color: #3498db; /* Color azul para los encabezados */
+    color: #ffffff; /* Texto blanco en los encabezados */
+  }
+  
+  .tabla-horario td {
+    background-color: #ecf0f1; /* Fondo gris claro para las celdas */
+    color: #2c3e50; /* Color oscuro para el texto */
+  }
+  
+  /* Estilo para el mensaje de "no hay horarios disponibles" */
+  p {
+    color: #e74c3c; /* Rojo para el mensaje de error */
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  
+  /* Colores para los días de la semana */
+  .tabla-horario th {
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+  .boton-guardar-todos {
+    background-color: #4CAF50; /* Color verde */
+    color: white; /* Texto blanco */
+    border: none; /* Sin borde */
+    padding: 12px 20px; /* Espaciado interno */
+    text-align: center; /* Centrar texto */
+    text-decoration: none; /* Eliminar subrayado */
+    display: inline-block; /* Alineación en línea */
+    font-size: 16px; /* Tamaño de fuente */
+    cursor: pointer; /* Cambiar el cursor a mano */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra del botón */
+    transition: background-color 0.3s, transform 0.2s; /* Transiciones suaves */
+  }
+  
+  .boton-guardar-todos:hover {
+    background-color: #45a049; /* Cambio de color en hover */
+    transform: scale(1.05); /* Efecto de aumento al pasar el mouse */
+  }
+  
+  .boton-guardar-todos:active {
+    background-color: #3e8e41; /* Color cuando se presiona */
+    transform: scale(0.98); /* Efecto al hacer clic */
+  }
+  .loader {
+    width: 120px;
+    height: 70px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+  }
+  
+  .loader-text {
+    position: absolute;
+    top: 0;
+    padding: 0;
+    margin: 0;
+    color: #C8B6FF;
+    animation: text_713 3.5s ease both infinite;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .load {
+    background-color: #9A79FF;
+    border-radius: 50px;
+    display: block;
+    height: 24px;
+    width: 24px;
+    bottom: 0;
+    position: absolute;
+    transform: translateX(96px);
+    animation: loading_713 3.5s ease both infinite;
+  }
+  
+  .load::before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+    background-color: #D1C2FF;
+    border-radius: inherit;
+    animation: loading2_713 3.5s ease both infinite;
+  }

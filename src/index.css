@@ -1,0 +1,40 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    background-attachment: fixed;
+    image-rendering: auto;
+  }
+  .body-login {
+    background-image: url('/Imagenes/fondoLogin.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .body-fondoHorarios{
+    background-image: url('/Imagenes/fondoHorarios.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .body-fondoGen {
+    background-image: url('/Imagenes/fondoGen.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .body-fondoForm {
+    background-image: url('/Imagenes/fondoForm.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .body-fondoH{
+    background-image: url('/Imagenes/fondoH.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+
