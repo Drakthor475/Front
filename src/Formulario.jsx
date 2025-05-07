@@ -122,11 +122,7 @@ export function FormularioHorario() {
       return;
     }
 
-    // Validación de 6-7 materias
-    if (data.materiasObligatorias.length < 6 || data.materiasObligatorias.length > 6) {  // Limite a 6 materias
-      alert("Debes seleccionar exactamente 6 materias.");
-      return;
-    }
+    
 
     const filtros = {
       semestre: Number(data.semestre),
