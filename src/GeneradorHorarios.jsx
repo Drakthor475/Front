@@ -11,23 +11,20 @@ export function MuestraHorarios() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const refs = useRef([]);
-  useBackground('fondoH')
+  useBackground('fondoH');
+
   // Función para verificar si el usuario está autenticado con JWT
   const checkAuth = () => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
         const decoded = jwt_decode(token);
-
-        // Verificar si el token ha expirado
         if (decoded.exp * 1000 < Date.now()) {
           console.error("Token expirado");
           localStorage.removeItem('token');
           setIsAuthenticated(false);
         } else {
           setIsAuthenticated(true);
-
-          // Solo redirigir a /horariosweb si no estamos ya en esa página
           if (location.pathname === "/" && decoded) {
             navigate("/horariosweb");
           }
@@ -41,25 +38,34 @@ export function MuestraHorarios() {
     }
   };
 
+  // Función para eliminar duplicados
+  const eliminarDuplicados = (horarios) => {
+    const horariosUnicos = [];
+    const combinacionesGeneradas = new Set();
+
+    horarios.forEach((horario) => {
+      const combinacion = horario.map((clase) => `${clase.lunes}-${clase.martes}-${clase.miercoles}-${clase.jueves}-${clase.viernes}`).join("-");
+      if (!combinacionesGeneradas.has(combinacion)) {
+        horariosUnicos.push(horario);
+        combinacionesGeneradas.add(combinacion);
+      }
+    });
+
+    return horariosUnicos;
+  };
+
   const handleImprimir = (index) => {
     const content = refs.current[index];
-
     if (!content) {
       console.error("No se encontró el contenido a imprimir.");
       return;
     }
-
-    // Crear una copia del contenido para manipularlo
     const contentToPrint = content.cloneNode(true);
-
-    // Eliminar los botones de impresión y volver antes de imprimir
     const buttons = contentToPrint.querySelectorAll("button");
     buttons.forEach(button => button.style.display = "none");
-
-    // Eliminar el título dentro del contenido que se pasa a la ventana
     const title = contentToPrint.querySelector("h2");
     if (title) {
-      title.remove(); // Elimina el título de la ventana de impresión
+      title.remove();
     }
 
     const ventana = window.open("", "_blank", "width=800,height=600");
@@ -100,7 +106,6 @@ export function MuestraHorarios() {
         </body>
       </html>
     `);
-
     ventana.document.close();
     ventana.focus();
     ventana.print();
@@ -112,13 +117,14 @@ export function MuestraHorarios() {
       setLoading(false);
       return;
     }
-    console.log("Filtros enviados:", filtros);
+
     axios
       .post("http://localhost:3000/horarios/generar-horarios", filtros)
       .then((response) => {
         console.log("Respuesta de la API:", response.data);
         if (Array.isArray(response.data) && response.data.length > 0) {
-          setHorarios(response.data); // Usamos toda la respuesta como horarios
+          const horariosSinDuplicados = eliminarDuplicados(response.data);
+          setHorarios(horariosSinDuplicados); // Usamos los horarios sin duplicados
         } else {
           setError("Formato de respuesta inválido.");
         }

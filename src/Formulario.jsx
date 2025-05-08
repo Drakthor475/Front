@@ -44,23 +44,61 @@ export function FormularioHorario() {
     control,
     name: "bloquesLibres",
   });
-
+  
+  const obtenerSemestreDeMateria = (idMateria) => {
+    return Math.floor(idMateria / 100) % 10;
+  };
+  
+  
   const toggleMateriaSeleccionada = (id) => {
     const actuales = watch("materiasObligatorias") || [];
+    const semestreMateria = obtenerSemestreDeMateria(id);
+  
     if (actuales.includes(id)) {
-      setValue(
-        "materiasObligatorias",
-        actuales.filter((m) => m !== id)
-      );
-    } else {
-      if (actuales.length >= 6) {  // Limite a 6 materias
-        alert("Solo puedes seleccionar hasta 6 materias.");
-        return;
-      }
-      setValue("materiasObligatorias", [...actuales, id]);
+      setValue("materiasObligatorias", actuales.filter((m) => m !== id));
+      return;
     }
+  
+    if (actuales.length >= 7) {
+      alert("Solo puedes seleccionar hasta 7 materias.");
+      return;
+    }
+  
+    // Definir las reglas de bloqueo
+    const bloqueos = {
+      
+      2: [0,6,7,8],
+      
+      4: [8],
+     
+      6: [2],
+     
+      8: [2, 4]
+    };
+  
+    const semestresSeleccionados = actuales.map(obtenerSemestreDeMateria);
+    
+    // Verificar si la nueva materia bloquea algún semestre ya seleccionado
+    const bloqueosMateriaActual = bloqueos[semestreMateria] || [];
+    const conflictos = semestresSeleccionados.filter(s => bloqueosMateriaActual.includes(s));
+    
+    // Verificar si alguna materia ya seleccionada bloquea la nueva materia
+    const conflictosInversos = semestresSeleccionados.some(s => {
+      const bloqueosDeS = bloqueos[s] || [];
+      return bloqueosDeS.includes(semestreMateria);
+    });
+  
+    if (conflictos.length > 0 || conflictosInversos) {
+      const semestresBloqueados = [...new Set([...conflictos, ...conflictosInversos ? [semestreMateria] : []])];
+      alert('Materias no disponibles 🔒');
+      return;
+    }
+  
+    setValue("materiasObligatorias", [...actuales, id]);
   };
-
+  
+  
+  
   useEffect(() => {
     if (semestreSeleccionado % 2 !== 0) {
       setSemestreInvalido(true);
@@ -69,16 +107,13 @@ export function FormularioHorario() {
     }
 
     if (semestreSeleccionado) {
-      // No limpiamos las materias seleccionadas para permitir múltiples semestres
-      setValue("profesoresPreferidos", {});
-
+      // No limpiamos los profesores preferidos para mantener los de todas las materias
       axios
         .post("http://localhost:3000/materias/findBySemestre", {
           semestreMateria: parseInt(semestreSeleccionado),
         })
         .then((response) => {
           setMaterias(response.data);
-          setProfesoresPorMateria({});
         })
         .catch((error) =>
           console.error("Error al obtener materias:", error)
@@ -116,16 +151,45 @@ export function FormularioHorario() {
 
   const onSubmit = (data, e) => {
     e.preventDefault();
-
+  
     if (semestreInvalido) {
       alert("Este semestre no está disponible por el momento.");
       return;
     }
-
-    
-
+  
+    // Validaciones para bloques libres
+    const bloques = data.bloquesLibres || [];
+    const bloqueSet = new Set();
+  
+    for (const bloque of bloques) {
+      const { dia, inicio, fin } = bloque;
+  
+      if (Number(fin) <= Number(inicio)) {
+        alert(`El bloque de ${dia} tiene una hora final menor o igual que la inicial.`);
+        return;
+      }
+  
+      if (Number(inicio) === 7 && Number(fin) === 22) {
+        alert(`No se permiten bloques de día completo (7:00 a 22:00) en ${dia}.`);
+        return;
+      }
+  
+      const clave = `${dia}-${inicio}-${fin}`;
+      if (bloqueSet.has(clave)) {
+        alert(`El bloque ${dia} de ${inicio}:00 a ${fin}:00 está repetido.`);
+        return;
+      }
+      bloqueSet.add(clave);
+    }
+  
+    const semestresUnicos = Array.from(
+      new Set(
+        (data.materiasObligatorias || []).map((id) => Math.floor(id / 100) % 10)
+      )
+    );
+  
     const filtros = {
-      semestre: Number(data.semestre),
+      semestre: semestresUnicos,
       materiasObligatorias: data.materiasObligatorias.map(Number),
       profesoresPreferidos: Object.fromEntries(
         Object.entries(data.profesoresPreferidos).map(([key, value]) => [
@@ -133,7 +197,7 @@ export function FormularioHorario() {
           value.map(Number),
         ])
       ),
-      bloquesLibres: data.bloquesLibres.map((bloque) => ({
+      bloquesLibres: bloques.map((bloque) => ({
         dia: bloque.dia,
         inicio: Number(bloque.inicio),
         fin: Number(bloque.fin),
@@ -141,9 +205,13 @@ export function FormularioHorario() {
       horaInicio: data.horaInicio ? Number(data.horaInicio) : 7,
       horaFin: data.horaFin ? Number(data.horaFin) : 22,
     };
-
+  
+    console.log("Datos enviados al backend:", filtros);
+  
     navigate("/GeneradorHorarios", { state: { filtros } });
   };
+  
+  
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="tabla-formulario">
@@ -153,7 +221,7 @@ export function FormularioHorario() {
       </button>
 
       <div className="form-group">
-        <label>Semestre:</label>
+        <label>Semestre actual:</label>
         <select 
           {...register("semestre", { required: true })}
           onChange={(e) => {
@@ -170,27 +238,28 @@ export function FormularioHorario() {
         {semestreInvalido && (
           <p className="error-message">Este semestre no está disponible.</p>
         )}
+       
       </div>
 
       <div className="form-group">
-        <label>Materias obligatorias (selecciona 6):</label>
+        <label>Materias obligatorias (selecciona hasta 7):</label>
 
         {!semestreInvalido && materias.length > 0 && (
           <div style={{ marginBottom: "10px" }}>
             <label>
-              Seleccionar todas las materias
+              Seleccionar todas las materias de este semestre
               <input
                 type="checkbox"
                 onChange={(e) => {
                   const allIds = materias.map((m) => m.id_materia);
                   if (e.target.checked) {
-                    if (allIds.length > 6) {
-                      alert("No puedes seleccionar más de 6 materias.");
+                    if (allIds.length + materiasSeleccionadas.length > 7) {
+                      alert("No puedes seleccionar más de 7 materias en total.");
                       return;
                     }
-                    setValue("materiasObligatorias", allIds);
+                    setValue("materiasObligatorias", [...new Set([...materiasSeleccionadas, ...allIds])]);
                   } else {
-                    setValue("materiasObligatorias", []);
+                    setValue("materiasObligatorias", materiasSeleccionadas.filter(id => !allIds.includes(id)));
                   }
                 }}
                 checked={materias.length > 0 && materias.every(m => materiasSeleccionadas.includes(m.id_materia))}
@@ -200,11 +269,11 @@ export function FormularioHorario() {
         )}
 
         {semestreInvalido ? (
-          <p className="error-message">Selecciona un semestre válido para ver las materias</p>
+          <p className="error-message"></p>
         ) : (
           materias.map((materia) => (
             <div key={materia.id_materia} className="materia-item">
-              <div><strong>{materia.nombre}</strong></div>
+              <div><strong>{materia.nombre}</strong> </div>
               <div>
                 <input
                   type="checkbox"
@@ -215,38 +284,42 @@ export function FormularioHorario() {
             </div>
           ))
         )}
-        {materias.length === 0 && !semestreInvalido && (
-          <p>No hay materias disponibles para este semestre</p>
-        )}
-        <p>Materias seleccionadas: {materiasSeleccionadas.length}/6</p>
+        
+        <p>Materias seleccionadas: {materiasSeleccionadas.length}/7</p>
       </div>
 
-      {materiasSeleccionadas.map((id) => {
-        const materia = materias.find((m) => m.id_materia === parseInt(id));
-        const profesores = profesoresPorMateria[id] || [];
+      {materiasSeleccionadas.length > 0 && (
+        <div className="form-group">
+          <h3>Profesores preferidos</h3>
+          {materiasSeleccionadas.map((id) => {
+            const materia = materias.find((m) => m.id_materia === parseInt(id)) || 
+              { id_materia: id, nombre: `Materia ID ${id}` };
+            const profesores = profesoresPorMateria[id] || [];
 
-        return (
-          <div key={id} className="form-group">
-            <label>Profesores preferidos para {materia?.nombre}:</label>
-            <select 
-              multiple 
-              {...register(`profesoresPreferidos.${id}`)}
-              className="profesor-select"
-            >
-              {profesores.length > 0 ? (
-                profesores.map((prof) => (
-                  <option key={prof.id} value={prof.id}>
-                    {prof.nombre}
-                  </option>
-                ))
-              ) : (
-                <option disabled>No hay profesores disponibles</option>
-              )}
-            </select>
-            <small>Mantén presionado Ctrl para seleccionar múltiples profesores</small>
-          </div>
-        );
-      })}
+            return (
+              <div key={id} className="profesor-group">
+                <label>Para {materia.nombre} (Semestre {Math.floor(id / 100) % 10}):</label>
+                <select 
+                  multiple 
+                  {...register(`profesoresPreferidos.${id}`)}
+                  className="profesor-select"
+                >
+                  {profesores.length > 0 ? (
+                    profesores.map((prof) => (
+                      <option key={prof.id} value={prof.id}>
+                        {prof.nombre}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No hay profesores disponibles</option>
+                  )}
+                </select>
+                <small>Mantén presionado Ctrl para seleccionar múltiples profesores</small>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="form-group">
         <label>Bloques libres:</label>
