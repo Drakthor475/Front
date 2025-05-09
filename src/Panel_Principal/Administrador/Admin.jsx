@@ -25,6 +25,7 @@ export function VistaAdmin({
   semestreModMateria,
   setSemestreModMateria,
   handleUpdateMateria,
+  semestresDisponibles,
   // Profesores
   idAltaProfesor,
   setIdAltaProfesor,
@@ -116,12 +117,19 @@ export function VistaAdmin({
                       onChange={(e) => setNombreAltaMateria(e.target.value)}
                       placeholder="Nombre de la materia"
                     />
-                    <input
-                      type="number"
+                   <select
                       value={semestreAltaMateria}
                       onChange={(e) => setSemestreAltaMateria(e.target.value)}
-                      placeholder="Semestre"
-                    />
+                      placeholder="Selecciona un semestre"
+                    >
+                      <option value="" disabled>Selecciona un semestre</option>
+                      {semestresDisponibles.map((semestre) => (
+                        <option key={semestre} value={semestre}>
+                          {semestre}
+                        </option>
+                      ))}
+                    </select>
+
                     <button onClick={handleAltaMateria}>Registrar</button>
 
                     <h3>Baja de Materia</h3>
@@ -156,12 +164,17 @@ export function VistaAdmin({
                       onChange={(e) => setNombreModMateria(e.target.value)}
                       placeholder="Nuevo nombre de la materia"
                     />
-                    <input
-                      type="number"
+                    <select
                       value={semestreModMateria}
                       onChange={(e) => setSemestreModMateria(e.target.value)}
-                      placeholder="Nuevo semestre"
-                    />
+                    >
+                      <option value="" disabled>Selecciona el nuevo semestre</option>
+                      {semestresDisponibles.map((semestre) => (
+                        <option key={semestre} value={semestre}>
+                          {semestre}
+                        </option>
+                      ))}
+                    </select>
                     <button onClick={handleUpdateMateria}>Actualizar</button>
                   </>
                 )}

@@ -15,7 +15,7 @@ export function Firstpage() {
 
   // Función para verificar si el usuario está autenticado con JWT
   const checkAuth = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       try {
         const decoded = jwt_decode(token);
@@ -23,7 +23,7 @@ export function Firstpage() {
         // Verificar si el token ha expirado
         if (decoded.exp * 1000 < Date.now()) {
           console.error("Token expirado");
-          localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
           setIsAuthenticated(false);
         } else {
           setIsAuthenticated(true);

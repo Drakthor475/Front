@@ -10,7 +10,7 @@ export function Horarios() {
   // GENERAL
   const navigate = useNavigate();
   const [semestre, setSemestre] = useState("");
-  const [horarios, setHorarios] = useState([]);
+  const [, setHorarios] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [profesores, setProfesores] = useState([]);
   const [todosHorarios, setTodosHorarios] = useState([]);
@@ -20,7 +20,8 @@ export function Horarios() {
   const [nombreAltaMateria, setNombreAltaMateria] = useState("");
   const [semestreAltaMateria, setSemestreAltaMateria] = useState("");
   const [idAltaMateria, setIdAltaMateria] = useState("");
-  
+  const semestresDisponibles = [ 2,4,6,8];  // Ejemplo de semestres disponibles
+
   // CAMBIOS MATERIAS
   const [idModMateria, setIdModMateria] = useState("");
   const [nombreModMateria, setNombreModMateria] = useState("");
@@ -62,7 +63,7 @@ export function Horarios() {
   }, []);
 
   const checkRol = () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (token) {
       try {
         const decoded = jwt_decode(token);
@@ -77,8 +78,8 @@ export function Horarios() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("rol");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("rol");
     navigate("/");
   };
 
@@ -153,9 +154,13 @@ export function Horarios() {
       alert("Selecciona una materia");
       return;
     }
+     const confirmacion1 = confirm("¿Estás seguro de que quieres eliminar la materia?");
+     if (!confirmacion1) return;
 
+     const confirmacion2 = confirm("Esta acción no se puede deshacer. ¿Deseas continuar?");
+     if (!confirmacion2) return;
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete(`http://localhost:3000/materias/${idBajaMateria}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -173,7 +178,7 @@ export function Horarios() {
     }
   
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       await axios.put(
         `http://localhost:3000/materias/${idModMateria}`,  
         {
@@ -225,9 +230,14 @@ export function Horarios() {
       alert("Selecciona un profesor");
       return;
     }
+    const confirmacion1 = confirm("¿Estás seguro de que quieres eliminar al profesor?");
+     if (!confirmacion1) return;
+
+    const confirmacion2 = confirm("Esta acción no se puede deshacer. ¿Deseas continuar?");
+    if (!confirmacion2) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete(`http://localhost:3000/profesores/${idBajaProfesor}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -245,7 +255,7 @@ export function Horarios() {
     }
   
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.put(
         `http://localhost:3000/profesores/${idModProfesor}`,
         {
@@ -399,7 +409,7 @@ const handleAgregarHorario = () => {
       }
     
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
     
         const datosParaEnviar = horariosAlta.map(h => {
           const dias = {};
@@ -455,7 +465,7 @@ const handleAgregarHorario = () => {
 
     
     const handleBajaHorario = async () => {
-      const token = localStorage.getItem('token');  // Aquí obtienes el token del localStorage (ajústalo si usas otro método)
+      const token = sessionStorage.getItem('token');  // Aquí obtienes el token del sesionStorage (ajústalo si usas otro método)
     
       if (!token) {
         setMensajeError("No se ha encontrado un token de autenticación.");
@@ -534,6 +544,7 @@ const handleAgregarHorario = () => {
           semestreAltaMateria={semestreAltaMateria}
           setSemestreAltaMateria={setSemestreAltaMateria}
           handleAltaMateria={handleAltaMateria}
+          semestresDisponibles={semestresDisponibles}
           
           idBajaMateria={idBajaMateria}
           setIdBajaMateria={setIdBajaMateria}

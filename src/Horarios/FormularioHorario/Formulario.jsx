@@ -71,7 +71,7 @@ export function FormularioHorario() {
       
       2: [0,6,7,8],
       
-      4: [8],
+      4: [0,8],
      
       6: [2],
      
@@ -91,7 +91,6 @@ export function FormularioHorario() {
     });
   
     if (conflictos.length > 0 || conflictosInversos) {
-      const semestresBloqueados = [...new Set([...conflictos, ...conflictosInversos ? [semestreMateria] : []])];
       alert('Materias no disponibles 🔒');
       return;
     }
@@ -102,6 +101,11 @@ export function FormularioHorario() {
   
   
   useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      navigate("/"); // redirige al login si no hay token
+      return;
+    }
     if (semestreSeleccionado % 2 !== 0) {
       setSemestreInvalido(true);
     } else {
@@ -200,7 +204,7 @@ export function FormularioHorario() {
         ])
       ),
       bloquesLibres: bloques.map((bloque) => ({
-        dia: bloque.dia,
+        dia: bloque.dia.charAt(0).toUpperCase() + bloque.dia.slice(1),
         inicio: Number(bloque.inicio),
         fin: Number(bloque.fin),
       })),

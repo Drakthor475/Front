@@ -221,8 +221,8 @@ export function Login() {
       const response = await axios.post('http://localhost:3000/usuarios/login', loginData);
       console.log('Datos del usuario desde el backend:', response.data);
       if (response.data) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('rol', response.data.nivelUsuario); // ← Rol guardado
+        sessionStorage.setItem('token', response.data.token);
+        sessionStorage.setItem('rol', response.data.nivelUsuario); // ← Rol guardado
         navigate('/horariosweb');
       }
     } catch (error) {

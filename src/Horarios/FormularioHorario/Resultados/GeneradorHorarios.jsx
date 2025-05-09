@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "./Complementos/MostrarHorarios.css";
 import { useBackground } from "../../../Fondos";
+import { useNavigate } from "react-router-dom";
 
 export function MuestraHorarios() {
   const location = useLocation();
@@ -11,48 +12,8 @@ export function MuestraHorarios() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const refs = useRef([]);
-  useBackground('fondoH');
-
-  // Función para verificar si el usuario está autenticado con JWT
-  const checkAuth = () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded = jwt_decode(token);
-        if (decoded.exp * 1000 < Date.now()) {
-          console.error("Token expirado");
-          localStorage.removeItem('token');
-          setIsAuthenticated(false);
-        } else {
-          setIsAuthenticated(true);
-          if (location.pathname === "/" && decoded) {
-            navigate("/horariosweb");
-          }
-        }
-      } catch (error) {
-        console.error("Token inválido", error);
-        setIsAuthenticated(false);
-      }
-    } else {
-      setIsAuthenticated(false);
-    }
-  };
-
-  // Función para eliminar duplicados
-  const eliminarDuplicados = (horarios) => {
-    const horariosUnicos = [];
-    const combinacionesGeneradas = new Set();
-
-    horarios.forEach((horario) => {
-      const combinacion = horario.map((clase) => `${clase.lunes}-${clase.martes}-${clase.miercoles}-${clase.jueves}-${clase.viernes}`).join("-");
-      if (!combinacionesGeneradas.has(combinacion)) {
-        horariosUnicos.push(horario);
-        combinacionesGeneradas.add(combinacion);
-      }
-    });
-
-    return horariosUnicos;
-  };
+  useBackground("fondoH");
+  const navigate=useNavigate()
 
   const handleImprimir = (index) => {
     const content = refs.current[index];
@@ -62,7 +23,7 @@ export function MuestraHorarios() {
     }
     const contentToPrint = content.cloneNode(true);
     const buttons = contentToPrint.querySelectorAll("button");
-    buttons.forEach(button => button.style.display = "none");
+    buttons.forEach((button) => (button.style.display = "none"));
     const title = contentToPrint.querySelector("h2");
     if (title) {
       title.remove();
@@ -112,19 +73,30 @@ export function MuestraHorarios() {
   };
 
   useEffect(() => {
+     const token = sessionStorage.getItem("token");
+    
+    if (!token) {
+      navigate("/"); // redirige al login si no hay token
+      return;
+    }
     if (!filtros) {
       setError("No se proporcionaron filtros.");
       setLoading(false);
       return;
     }
 
-    axios
-      .post("http://localhost:3000/horarios/generar-horarios", filtros)
+
+
+      axios
+      .post("http://localhost:3000/horarios/generar-horarios", filtros, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        },
+       })
       .then((response) => {
         console.log("Respuesta de la API:", response.data);
         if (Array.isArray(response.data) && response.data.length > 0) {
-          const horariosSinDuplicados = eliminarDuplicados(response.data);
-          setHorarios(horariosSinDuplicados); // Usamos los horarios sin duplicados
+          setHorarios(response.data); // Ya no eliminamos duplicados
         } else {
           setError("Formato de respuesta inválido.");
         }

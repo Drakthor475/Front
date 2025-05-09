@@ -2,15 +2,25 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "./Componentes/Formato.css";
 import { useBackground } from "../../Fondos";
+import { useNavigate } from "react-router-dom";
+
 
 export function HorarioSemestre() {
   useBackground('fondoGen')
   const location = useLocation();
   const [horarios, setHorarios] = useState([]);
+  const navigate=useNavigate();
+
   
 
   useEffect(() => {
     setHorarios(location.state ? location.state.horarios : []);
+    const token = sessionStorage.getItem("token");
+    
+    if (!token) {
+      navigate("/"); // redirige al login si no hay token
+      return;
+    }
   }, [location]);
 
   const obtenerRango = (hora) => {
