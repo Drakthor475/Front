@@ -1,9 +1,9 @@
 import { Routes, Route } from "react-router-dom";
-import { Firstpage } from "./Firstpage";
-import { Horarios } from "./horariosweb";
-import { HorarioSemestre } from "./HorariosSemestre";
-import { FormularioHorario } from "./Formulario";
-import { MuestraHorarios } from "./GeneradorHorarios";
+import {Firstpage} from "./Registro_Usuario/Firstpage"
+import { Horarios } from "./Panel_Principal/horariosweb";
+import { HorarioSemestre } from "./Horarios/VistaGeneral/HorariosSemestre";
+import { FormularioHorario } from "./Horarios/FormularioHorario/Formulario";
+import { MuestraHorarios } from "./Horarios/FormularioHorario/Resultados/GeneradorHorarios";
 import { PrivateRoute } from "./Rutas-privadas"; 
 
 export function App() {

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react"; 
 import { useNavigate, useLocation } from "react-router-dom";
 
-import { Login } from "./login";
-import { LogoMAC } from "./LogoMAC";
-import { useBackground } from "./Fondos";
+import { Login } from "./Componentes/login";
+import { LogoMAC } from "./Componentes/LogoMAC";
+import { useBackground } from "../Fondos";
 import jwt_decode from 'jwt-decode';
 
 export function Firstpage() {

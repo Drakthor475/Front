@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import jwt_decode from "jwt-decode";
-import { VistaAdmin } from "./Admin";
-import { VistaViewer } from "./Viewer";
-import { useBackground } from "./Fondos";
+import { VistaAdmin } from "./Administrador/Admin";
+import { VistaViewer } from "./Viewer/Viewer";
+import { useBackground } from "../Fondos";
 
 export function Horarios() {
   // GENERAL

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
-import "./MostrarHorarios.css";
-import { useBackground } from "./Fondos";
+import "./Complementos/MostrarHorarios.css";
+import { useBackground } from "../../../Fondos";
 
 export function MuestraHorarios() {
   const location = useLocation();

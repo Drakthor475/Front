@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./FormularioGenerar.css";
-import { useBackground } from "./Fondos";
+import "./Complementos/FormularioGenerar.css"
+import { useBackground } from "../../Fondos";
+
+
 
 export function FormularioHorario() {
   const navigate = useNavigate();

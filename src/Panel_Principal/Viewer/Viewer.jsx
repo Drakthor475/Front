@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import { Tarjeta } from "./Tarjeta";
-import { FraseUNAM } from "./FraseUNAM";
+import { Tarjeta } from "./Componente/Tarjeta";
+import { FraseUNAM } from "./Componente/FraseUNAM";
 
 
 export function VistaViewer({ semestre, setSemestre, handleBuscar, handleGenerar }) {
